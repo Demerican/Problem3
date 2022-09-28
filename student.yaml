@@ -1,0 +1,153 @@
+openapi: "3.0.1"
+
+info:
+  title: A Student record API
+  version: "0.0.1"
+
+servers:
+  - url: http://localhost:8080/vle/api/v1
+
+
+paths:
+  /Student:
+    get:
+      summary: Get all students added
+      operationId: get_all
+      description: Returns all students registered
+      responses:
+        '200':
+          description: "A list of students"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Student"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    post:
+      summary: Insert a new student 
+      operationId: insert
+      description: Create a new student and add it to the collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+      responses:
+        '201':
+          description: Student successfully created
+          content:
+            application/json:
+              schema:
+                properties:
+                  studentNumber:
+                    type: integer
+                    description: the student number of the student newly created
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+
+  /students/{studentNumber}:
+    parameters:
+      - name: studentNumber
+        in: path
+        description: student number of the student
+        schema:
+          type: integer
+        required: true
+    get:
+      summary: Get a student
+      operationId: get_student
+      description: Returns a single student based on the student number
+      responses:
+        '200':
+          description: student response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    put:
+      summary: Update an existing student
+      operationId: update_student
+      description: updates an existing student
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Student"
+      responses:
+        '200':
+          description: 'Student was successfully updated'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+    delete:
+      summary: Delete an existing student
+      operationId: delete_student
+      description: deletes an existing student
+      responses:
+        '204':
+          description: Student was successfully deleted
+        default:
+          $ref: "#/components/responses/ErrorResponse"
+
+components:
+  schemas:
+    Student:
+      title: Student Description
+      type: object
+      properties:
+        studentNumber:
+          type: integer
+          description: the student number of the student
+        firstname:
+          type: string
+          description: the first name of the student
+        lastname:
+          type: string
+          description: the last name of the student
+        email:
+          type: string
+          description: student email address
+        assessments:
+          type: string
+          description: assessments
+        weight:
+          type: integer
+          description: assessment weight
+        marks:
+          type: integer
+          description: student marks
+        course:
+          type: string
+          description: course enrolled in
+        courseCode:
+          type: integer
+          description: code of the course
+    Error:
+      type: object
+      properties:
+        errorType:
+          type: string
+          enum:
+            - BadRequest
+
+            - Not Found
+
+            - InternalServerError
+        message:
+          type: string
+
+  responses:
+    ErrorResponse:
+      description: Error handling user
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
